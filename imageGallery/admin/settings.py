@@ -160,3 +160,7 @@ CELERY_RESULT_SERIALIZER = 'json'
 STATICFILES_DIRS = [
     os.path.join(BASE_DIR, 'frontendgallery/build/static')
 ]
+
+MEDIA_ROOT = '/media/'
+
+MEDIA_URL = '/media/'
