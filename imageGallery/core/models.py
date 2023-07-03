@@ -7,4 +7,4 @@ class Image(models.Model):
     
 class Gallery(models.Model):
     name = models.CharField(max_length=100)
-    images = models.ManyToManyField('Image')
+    images = models.ManyToManyField('Image', blank=True)
