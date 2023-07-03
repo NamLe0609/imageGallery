@@ -1,5 +1,10 @@
 import React, { useState } from 'react';
 import { MDBRow, MDBCol, MDBBtn } from 'mdb-react-ui-kit';
+import { getCookie } from '../getCookie';
+import axios from "axios";
+
+const BASE_URL = "http://127.0.0.1:8000/";
+const CSRFTOKEN = getCookie("csrftoken");
 
 const FileUploadForm = () => {
   const [selectedFile, setSelectedFile] = useState(null);
@@ -8,9 +13,29 @@ const FileUploadForm = () => {
     setSelectedFile(event.target.files[0]);
   };
 
-  const handleFormSubmit = (event) => {
+  const handleFormSubmit = async (event) => {
     event.preventDefault();
-    console.log(selectedFile);
+    
+    if (selectedFile) {
+        let success
+        try {
+            const response = await axios.post(BASE_URL + "images/", selectedFile, {
+              headers: {
+                "X-CSRFToken": CSRFTOKEN,
+                "Content-Type": "application/json",
+              },
+            });
+            success = response.data;
+          } catch (error) {
+            console.log(error);
+          }
+          if (success) {
+            //setShowUploadSuccess(true);
+          } else {
+            //setShowUploadFail(true);
+          }
+    }
+
     setSelectedFile(null);
   };
 
