@@ -1,12 +1,12 @@
-import React, { useState } from 'react';
-import { MDBRow, MDBCol, MDBBtn } from 'mdb-react-ui-kit';
-import { getCookie } from '../getCookie';
+import React, { useState } from "react";
+import { MDBRow, MDBCol, MDBBtn } from "mdb-react-ui-kit";
+import { getCookie } from "../getCookie";
 import axios from "axios";
 
 const BASE_URL = "http://127.0.0.1:8000/";
 const CSRFTOKEN = getCookie("csrftoken");
 
-const FileUploadForm = () => {
+const FileUploadForm = (gallery, onFormSubmit) => {
   const [selectedFile, setSelectedFile] = useState(null);
 
   const handleFileInputChange = (event) => {
@@ -15,42 +15,47 @@ const FileUploadForm = () => {
 
   const handleFormSubmit = async (event) => {
     event.preventDefault();
-    
+
     if (selectedFile) {
-        let success
-        try {
-            const response = await axios.post(BASE_URL + "images/", selectedFile, {
-              headers: {
-                "X-CSRFToken": CSRFTOKEN,
-                "Content-Type": "application/json",
-              },
-            });
-            success = response.data;
-          } catch (error) {
-            console.log(error);
-          }
-          if (success) {
-            //setShowUploadSuccess(true);
-          } else {
-            //setShowUploadFail(true);
-          }
+      let success;
+      try {
+        const formData = new FormData();
+        formData.append("image", selectedFile);
+        formData.append("galleries", gallery);
+
+        const response = await axios.post(BASE_URL + "images/", formData, {
+          headers: {
+            "X-CSRFToken": CSRFTOKEN,
+            "Content-Type": "multipart/form-data",
+          },
+        });
+        success = response.data;
+      } catch (error) {
+        console.log(error);
+      }
+      if (success) {
+        //setShowUploadSuccess(true);
+      } else {
+        //setShowUploadFail(true);
+      }
     }
 
     setSelectedFile(null);
+    onFormSubmit();
   };
 
   return (
     <form onSubmit={handleFormSubmit}>
       <MDBRow>
-        <MDBCol size="8">
+        <MDBCol size={8}>
           <input
             type="file"
-            class="form-control"
+            className="form-control"
             accept=".jpg,.jpeg,.png"
             onChange={handleFileInputChange}
           />
         </MDBCol>
-        <MDBCol size="4">
+        <MDBCol>
           <MDBBtn type="submit">Upload</MDBBtn>
         </MDBCol>
       </MDBRow>
