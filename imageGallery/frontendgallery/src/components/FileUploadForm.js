@@ -6,7 +6,7 @@ import axios from "axios";
 const BASE_URL = "http://127.0.0.1:8000/";
 const CSRFTOKEN = getCookie("csrftoken");
 
-const FileUploadForm = (gallery, onFormSubmit) => {
+const FileUploadForm = ({ gallery, onFormSubmit }) => {
   const [selectedFile, setSelectedFile] = useState(null);
 
   const handleFileInputChange = (event) => {
@@ -17,26 +17,20 @@ const FileUploadForm = (gallery, onFormSubmit) => {
     event.preventDefault();
 
     if (selectedFile) {
-      let success;
       try {
         const formData = new FormData();
         formData.append("image", selectedFile);
-        formData.append("galleries", gallery);
+        formData.append("galleryID", gallery);
 
+        // eslint-disable-next-line no-unused-vars
         const response = await axios.post(BASE_URL + "images/", formData, {
           headers: {
             "X-CSRFToken": CSRFTOKEN,
             "Content-Type": "multipart/form-data",
           },
         });
-        success = response.data;
       } catch (error) {
         console.log(error);
-      }
-      if (success) {
-        //setShowUploadSuccess(true);
-      } else {
-        //setShowUploadFail(true);
       }
     }
 

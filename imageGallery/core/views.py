@@ -14,7 +14,14 @@ class ImageAPIView(APIView):
     def post(self, request):
         serializer = ImageSerializer(data=request.data)
         if serializer.is_valid():
-            serializer.save()
+            image_file = request.FILES.get('image')
+            image = Image.objects.create(image=image_file)
+
+            gallery_id = request.POST.get('galleryID')
+            gallery = Gallery.objects.get(id=gallery_id)
+            gallery.images.add(image)
+            image.save()
+            
             return Response(serializer.data, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
     
@@ -32,7 +39,12 @@ class ImageAPIView(APIView):
         return Response(status=status.HTTP_204_NO_CONTENT)
 
 class GalleryAPIView(APIView):
-    def get(self, request):
+    def get(self, request, pk=None):
+        if pk is not None:
+            gallery = get_object_or_404(Gallery, pk=pk)
+            serializer = GallerySerializer(gallery)
+            return Response(serializer.data, status=status.HTTP_200_OK)
+
         galleries = Gallery.objects.all()
         serializer = GallerySerializer(galleries, many=True)
         return Response(serializer.data, status=status.HTTP_200_OK)
